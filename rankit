@@ -1,0 +1,19 @@
+--Created on 10/8/2019
+--Ranks band by number of records
+--Reason for rank is to find the most used freq band across a specific date range.
+
+
+select rank() over(order by points desc) 
+as RANK, band, points, sw_lat, sw_long, sw_lat ||''||sw_long key
+from
+(select 
+min(most_used_ecgi_freq) band, 
+sum(rsrp_recs)points, 
+sw_lat, 
+sw_long
+from IQI_SUMMARY.iqi_mgrs100m_daily_summary
+where yyyymmdd between ('20190313') and ('20190325')
+AND sw_long >= (-88.465) and sw_long <= (-88.256) and sw_lat >= (33.6516) and sw_lat <= (33.880)
+AND most_used_ecgi_freq is not null
+Group By most_used_ecgi_freq, sw_lat, sw_long) a 
+Order by Rank, sw_lat
